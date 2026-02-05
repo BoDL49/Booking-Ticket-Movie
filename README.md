@@ -70,8 +70,8 @@ Follow these steps to set up the project locally.
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/yourusername/vibeticket.git
-    cd vibeticket
+    git clone https://github.com/BoDL49/Booking-Ticket-Movie
+    cd Booking-Ticket-Movie
     ```
 
 2.  **Install dependencies**
