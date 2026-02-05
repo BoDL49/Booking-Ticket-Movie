@@ -1,0 +1,268 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  emailVerified  DateTime?
+  image          String?
+  password       String?
+  role           Role      @default(USER)
+  phone          String?
+  birthday       DateTime?
+  avatarUrl      String?
+  loyaltyPoints  Int       @default(0)
+  
+  bookings       Booking[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Movie {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  duration     Int      // minutes
+  posterUrl    String?
+  trailerUrl   String?
+  releaseDate  DateTime
+  rating       Float?   // 0-10
+  ageRating    String   // P, K, C13, C16, C18
+  country      String?
+  
+  directorId   String?
+  director     Person?  @relation("DirectedMovies", fields: [directorId], references: [id])
+  
+  cast         MovieCast[]
+  genres       MovieGenre[]
+  showtimes    Showtime[]
+  sliders      Slider[]
+  
+  status       MovieStatus @default(COMING_SOON)
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum MovieStatus {
+  NOW_SHOWING
+  COMING_SOON
+  ENDED
+  UNRELEASED
+}
+
+model Genre {
+  id     String       @id @default(cuid())
+  name   String       @unique
+  slug   String       @unique
+  movies MovieGenre[]
+}
+
+model MovieGenre {
+  movieId String
+  genreId String
+  movie   Movie @relation(fields: [movieId], references: [id])
+  genre   Genre @relation(fields: [genreId], references: [id])
+  
+  @@id([movieId, genreId])
+}
+
+model Person {
+  id             String  @id @default(cuid())
+  name           String
+  bio            String?
+  avatarUrl      String?
+  
+  directedMovies Movie[] @relation("DirectedMovies")
+  actedIn        MovieCast[]
+}
+
+model MovieCast {
+  movieId       String
+  personId      String
+  movie         Movie  @relation(fields: [movieId], references: [id])
+  person        Person @relation(fields: [personId], references: [id])
+  characterName String
+  
+  @@id([movieId, personId])
+}
+
+
+model Cinema {
+  id        String       @id @default(cuid())
+  name      String       @unique
+  address   String?
+  imageUrl  String?
+  halls     CinemaHall[]
+  
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model CinemaHall {
+  id         String     @id @default(cuid())
+  name       String
+  totalSeats Int
+  
+  cinemaId   String?
+  cinema     Cinema?    @relation(fields: [cinemaId], references: [id])
+  
+  showtimes  Showtime[]
+  seats      Seat[]
+}
+
+model Seat {
+  id      String   @id @default(cuid())
+  hallId  String
+  hall    CinemaHall @relation(fields: [hallId], references: [id])
+  row     String
+  number  Int
+  type    SeatType @default(STANDARD)
+  
+  items   BookingItem[]
+  
+  @@unique([hallId, row, number])
+}
+
+enum SeatType {
+  STANDARD
+  VIP
+  COUPLE
+}
+
+model Showtime {
+  id        String   @id @default(cuid())
+  movieId   String
+  movie     Movie    @relation(fields: [movieId], references: [id])
+  hallId    String
+  hall      CinemaHall @relation(fields: [hallId], references: [id])
+  startTime DateTime
+  
+  format    ShowtimeFormat @default(TWO_D)
+  language  ShowtimeLanguage @default(VIETSUB)
+  
+  bookings  Booking[]
+  basePrice Int
+  
+  createdAt DateTime @default(now())
+}
+
+enum ShowtimeFormat {
+  TWO_D  @map("2D")
+  THREE_D @map("3D")
+  IMAX
+}
+
+enum ShowtimeLanguage {
+  VIETSUB
+  DUBBED
+}
+
+model Booking {
+  id         String      @id @default(cuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id])
+  showtimeId String?
+  showtime   Showtime?    @relation(fields: [showtimeId], references: [id])
+  
+  totalPrice Int
+  status     BookingStatus @default(PENDING)
+  qrCode     String?
+  
+  items      BookingItem[]
+  
+  createdAt  DateTime    @default(now())
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model BookingItem {
+  id        String  @id @default(cuid())
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
+  
+  seatId    String?
+  seat      Seat?   @relation(fields: [seatId], references: [id], onDelete: SetNull)
+  
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+  
+  quantity  Int     @default(1)
+  price     Int
+}
+
+model ProductCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  products    Product[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  image       String?
+  price       Int
+  description String?
+  
+  categoryId  String?
+  category    ProductCategory? @relation(fields: [categoryId], references: [id])
+  
+  legacyCategory String?   @map("category")
+
+  isAvailable Boolean  @default(true)
+  items       BookingItem[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Slider {
+  id        String   @id @default(cuid())
+  title     String
+  imageUrl  String?
+  linkUrl   String?
+  movieId   String?
+  movie     Movie?   @relation(fields: [movieId], references: [id], onDelete: SetNull)
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
