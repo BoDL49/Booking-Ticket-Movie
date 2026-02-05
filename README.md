@@ -1,4 +1,4 @@
-# 🎟️ Vibeticket - Modern Cinema Booking Platform
+# 🎟️ Bơticket - Modern Cinema Booking Platform
 
 <div align="center">
 
@@ -12,7 +12,7 @@
 </div>
 
 <p align="center">
-  <strong>Bơticket</strong> is a strictly modern, high-performance cinema booking application built to deliver a premium user experience. It features real-time seat selection, multiple payment gateway integrations, and a robust loyalty program.
+  <strong>BơTicket</strong> is a strictly modern, high-performance cinema booking application built to deliver a premium user experience. It features real-time seat selection, multiple payment gateway integrations, and a robust loyalty program.
 </p>
 
 <div align="center">
