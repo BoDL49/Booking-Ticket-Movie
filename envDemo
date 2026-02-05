@@ -1,0 +1,18 @@
+DATABASE_URL="Your_Database_Url"
+AUTH_SECRET="Your_Auth_Secret"
+
+# PayOS Keys (Lấy tại https://payos.vn)
+PAYOS_CLIENT_ID="Your_Payos_Client"
+PAYOS_API_KEY="Your_Payos_API_Key"
+PAYOS_CHECKSUM_KEY="Your_Payos_Checksum_Key"
+
+# VNPay Keys (Sandbox - Lấy tại https://sandbox.vnpayment.vn/)
+VNPAY_TMN_CODE="Your_VNPAY_TMN_Code"
+VNPAY_HASH_SECRET="Your_VNPAY_Hash_Secret"
+VNPAY_URL="Your_VNPAY_Url"
+
+# App URL (Required for Payment Redirect)
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+PAYPAL_CLIENT_ID="Your_Paypal_Client_ID"
+PAYPAL_CLIENT_SECRET="Your_Paypal_Client_Secret"
